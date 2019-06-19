@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +46,7 @@ public class StudentController
         return new ResponseEntity<>(myStudents, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/Student/{StudentId}",
-                produces = {"application/json"})
+    @GetMapping(value = "/Student/{StudentId}", produces = {"application/json"})
     public ResponseEntity<?> getStudentById(
             @PathVariable
                     Long StudentId)
@@ -56,12 +56,13 @@ public class StudentController
     }
 
 
-    @GetMapping(value = "/student/namelike/{name}",
-                produces = {"application/json"})
+    @GetMapping(value = "/student/namelike/{name}", produces = {"application/json"})
     public ResponseEntity<?> getStudentByNameContaining(
-            @PathVariable String name)
+            @PathVariable String name,
+            @PageableDefault(page = 0, size = 8) // by default size = 10
+            Pageable pageable)
     {
-        List<Student> myStudents = studentService.findStudentByNameLike(name);
+        List<Student> myStudents = studentService.findStudentByNameLike(name, pageable);
         return new ResponseEntity<>(myStudents, HttpStatus.OK);
     }
 
