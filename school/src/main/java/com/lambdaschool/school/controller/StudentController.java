@@ -5,6 +5,7 @@ import com.lambdaschool.school.service.StudentService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -28,7 +29,7 @@ public class StudentController
 
     // Please note there is no way to add students to course yet!
 
-    @ApiOperation(value = "Return all Students", response = Student.class, responseContainer = "List")
+    @ApiOperation(value = "Returns all Students", response = Student.class, responseContainer = "List")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "integr", paramType = "query",
                     value = "Results page you want to retrieve (0..N)"),
@@ -46,18 +47,21 @@ public class StudentController
         return new ResponseEntity<>(myStudents, HttpStatus.OK);
     }
 
+
+    @ApiOperation(value = "Return student with the given Student ID", response = Student.class)
     @GetMapping(value = "/Student/{StudentId}", produces = {"application/json"})
     public ResponseEntity<?> getStudentById(
-            @PathVariable
-                    Long StudentId)
+            @ApiParam(value = "Student ID", required = true, example = "1")
+            @PathVariable Long StudentId)
     {
         Student r = studentService.findStudentById(StudentId);
         return new ResponseEntity<>(r, HttpStatus.OK);
     }
 
-
+    @ApiOperation(value = "Return students with a name containing entry", response = Student.class, responseContainer = "List")
     @GetMapping(value = "/student/namelike/{name}", produces = {"application/json"})
     public ResponseEntity<?> getStudentByNameContaining(
+            @ApiParam(value = "Student name Substring", required = true, example = "Ja")
             @PathVariable String name,
             @PageableDefault(page = 0, size = 8) // by default size = 10
             Pageable pageable)
@@ -66,7 +70,7 @@ public class StudentController
         return new ResponseEntity<>(myStudents, HttpStatus.OK);
     }
 
-
+    @ApiOperation(value = "Creates a new student", notes = "URL for new student will be in the location header", response = void.class)
     @PostMapping(value = "/Student",
                  consumes = {"application/json"},
                  produces = {"application/json"})
@@ -84,23 +88,22 @@ public class StudentController
         return new ResponseEntity<>(null, responseHeaders, HttpStatus.CREATED);
     }
 
-
+    @ApiOperation(value = "Updates any current student", response = void.class)
     @PutMapping(value = "/Student/{Studentid}")
     public ResponseEntity<?> updateStudent(
-            @RequestBody
-                    Student updateStudent,
-            @PathVariable
-                    long Studentid)
+            @ApiParam(value = "Student ID", required = true, example = "1")
+            @RequestBody Student updateStudent,
+            @PathVariable long Studentid)
     {
         studentService.update(updateStudent, Studentid);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
+    @ApiOperation(value = "Delete any current student", response = void.class)
     @DeleteMapping("/Student/{Studentid}")
     public ResponseEntity<?> deleteStudentById(
-            @PathVariable
-                    long Studentid)
+            @ApiParam(value = "Student ID", required = true)
+            @PathVariable long Studentid)
     {
         studentService.delete(Studentid);
         return new ResponseEntity<>(HttpStatus.OK);
